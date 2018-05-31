@@ -202,7 +202,7 @@ const (
 		var uppie = new Uppie();
 
 		uppie(document.querySelector('#folder-input'), function (event, formData, files) {
-			s;
+			blockPage();
 			var xhr = new XMLHttpRequest();
 
 			xhr.upload.addEventListener("progress", updateProgress);

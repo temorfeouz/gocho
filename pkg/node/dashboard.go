@@ -99,15 +99,15 @@ func delete(conf *config.Config) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := os.RemoveAll(buildFullFilePath(conf, r.FormValue("elem"))); err != nil {
+		if err := os.RemoveAll(buildFullFilePath(conf.ShareDirectory, r.FormValue("elem"))); err != nil {
 			w.Write([]byte(err.Error()))
 			return
 		}
 	}
 }
 
-func buildFullFilePath(conf *config.Config, partPath string) string {
-	basePath := strings.TrimRight(conf.ShareDirectory, "/")
+func buildFullFilePath(firstPart, partPath string) string {
+	basePath := strings.TrimRight(firstPart, "/")
 	partPath = strings.TrimLeft(partPath, "/")
 
 	return fmt.Sprintf("%s/%s", basePath, partPath)
@@ -129,7 +129,7 @@ func validatePath(p string, conf *config.Config) error {
 	if strings.Contains(p, "..") {
 		return errors.New("Incorrect characters")
 	}
-	fullPath := buildFullFilePath(conf, p)
+	fullPath := buildFullFilePath(conf.ShareDirectory, p)
 	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
 		return errors.New(fmt.Sprintf("File '%s' doesnt exists", fullPath))
 	}
@@ -158,7 +158,7 @@ func archive(conf *config.Config) func(w http.ResponseWriter, r *http.Request) {
 		zw := gzip.NewWriter(outFile)
 
 		// Add some files to the archive.
-		err = addFiles(zw, buildFullFilePath(conf, relativePath), "")
+		err = addFiles(zw, buildFullFilePath(conf.ShareDirectory, relativePath), "")
 
 		if err != nil {
 			w.Write([]byte(fmt.Sprintf("On archiving -> %s", err.Error())))
@@ -244,7 +244,8 @@ func addFiles(w *gzip.Writer, basePath, baseInZip string) error {
 }
 
 func getTmpFolder(conf *config.Config) string {
-	tmpFolderPath := buildFullFilePath(conf, tmpFolder)
+
+	tmpFolderPath := buildFullFilePath(os.TempDir(), tmpFolder)
 	if _, err := os.Stat(tmpFolderPath); os.IsNotExist(err) {
 		os.MkdirAll(tmpFolderPath, os.ModePerm)
 	}
