@@ -57,31 +57,36 @@ func nodesHandler(nodeList *list.List) func(http.ResponseWriter, *http.Request) 
 func fileUpload(conf *config.Config) func(w http.ResponseWriter, r *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseMultipartForm(922337203685477580)
+		err := r.ParseMultipartForm(2 << 20)
 		if err != nil {
 			panic(err)
 		}
 
-		file, _, err := r.FormFile("files[]")
-		if err != nil {
-			w.Write([]byte(fmt.Sprintf("Error on upload file -> %s", err)))
-			return
-		}
-		defer file.Close()
+		// file, _, err := r.FormFile("files[]")
+		// if err != nil {
+		// 	w.Write([]byte(fmt.Sprintf("Error on upload file -> %s", err)))
+		// 	return
+		// }
+		// defer file.Close()
 		if r.MultipartForm != nil {
 			for _, tmp := range r.MultipartForm.File {
 				for _, v := range tmp {
 
 					file, err := v.Open()
+
 					if err != nil {
 						w.Write([]byte(fmt.Sprintf("Error on open file -> %s", err)))
 						return
 					}
+
 					err = saveFile(file, conf.ShareDirectory+r.FormValue("dir"), v.Filename)
 					if err != nil {
 						w.Write([]byte(fmt.Sprintf("Error on create file -> %s", err)))
 						return
 					}
+
+					file.Close()
+
 				}
 			}
 		}
@@ -266,10 +271,12 @@ func saveFile(file multipart.File, basePath, filePath string) error {
 		os.MkdirAll(fullFilePath, os.ModePerm)
 	}
 
+	// here write directly
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		return err
 	}
+
 	return ioutil.WriteFile(
 		fmt.Sprintf("%s/%s", fullFilePath, filename),
 		data, os.ModePerm,
