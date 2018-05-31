@@ -165,7 +165,7 @@ const (
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState === 4) {
-				location.reload();
+				//location.reload();
 			}
 		  }
 
@@ -183,7 +183,7 @@ const (
 
 		        // xhr.onreadystatechange = function() {
 		        //  if (xhr.readyState === 4) {
-		        //      location.reload();
+		        //      //location.reload();
 		        //  }
 		        //   }
 
@@ -215,9 +215,12 @@ const (
 			xhr.onreadystatechange = function() {
 				console.log(xhr.readyState );
 				if (xhr.readyState === 4) {
-					location.reload();
+					//location.reload();
 				}
 			  }
+
+			  console.log(window.location.pathname);
+			formData.append("dir",window.location.pathname);
 
 			xhr.send(formData);
 			});
@@ -239,9 +242,11 @@ const (
 
 				xhr.onreadystatechange = function() {
 					if (xhr.readyState === 4) {
-						location.reload();
+						//location.reload();
 					}
 				  }
+				  console.log(window.location.pathname);
+				formData.append("dir",window.location.pathname);
 
 				xhr.send(formData);
 				})
