@@ -40,7 +40,7 @@ class App extends Component {
       <div className="wrapper">
         <SideBar
           toggle={this.state.toggle}
-          title="Gocho"
+          title="Local file sharing"
           menu={this.menu}
           onMenuSelected={this.menuSelectedHandler.bind(this)} />
         <div className="content-wrapper">

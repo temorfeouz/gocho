@@ -5,7 +5,6 @@ const tape          = require('tape')
     , workerFarm    = require('../')
     , childPath     = require.resolve('./child')
     , fs            = require('fs')
-    , os            = require('os')
 
 function uniq (ar) {
   let a = [], i, j
@@ -24,7 +23,7 @@ tape('simple, exports=function test', function (t) {
   let child = workerFarm(childPath)
   child(0, function (err, pid, rnd) {
     t.ok(pid > process.pid, 'pid makes sense')
-    t.ok(pid < process.pid + 750, 'pid makes sense')
+    t.ok(pid < process.pid + 500, 'pid makes sense')
     t.ok(rnd >= 0 && rnd < 1, 'rnd result makes sense')
   })
 
@@ -41,7 +40,7 @@ tape('simple, exports.fn test', function (t) {
   let child = workerFarm(childPath, [ 'run0' ])
   child.run0(function (err, pid, rnd) {
     t.ok(pid > process.pid, 'pid makes sense')
-    t.ok(pid < process.pid + 750, 'pid makes sense')
+    t.ok(pid < process.pid + 500, 'pid makes sense')
     t.ok(rnd >= 0 && rnd < 1, 'rnd result makes sense')
   })
 
@@ -266,9 +265,9 @@ tape('single concurrent call', function (t) {
       child(defer, function () {
         if (++cbc == count) {
           let time = Date.now() - start
-          // upper-limit tied closely to `count`, 1.3 is generous but accounts for all the timers
+          // upper-limit tied closely to `count`, 1.2 is generous but accounts for all the timers
           // coming back at the same time and the IPC overhead
-          t.ok(time > (defer * count) && time < (defer * count * 1.3), 'processed tasks sequentially (' + time + ')')
+          t.ok(time > (defer * count) && time < (defer * count * 1.2), 'processed tasks sequentially (' + time + 'ms)')
           workerFarm.end(child, function () {
             t.ok(true, 'workerFarm ended')
           })
@@ -326,7 +325,7 @@ tape('durability', function (t) {
   let child = workerFarm({ maxConcurrentWorkers: 2 }, childPath, [ 'killable' ])
     , ids   = []
     , pids  = []
-    , count = 20
+    , count = 10
     , i     = count
 
   while (i--) {
@@ -353,7 +352,7 @@ tape('simple, end callback', function (t) {
   let child = workerFarm(childPath)
   child(0, function (err, pid, rnd) {
     t.ok(pid > process.pid, 'pid makes sense ' + pid + ' vs ' + process.pid)
-    t.ok(pid < process.pid + 750, 'pid makes sense ' + pid + ' vs ' + process.pid)
+    t.ok(pid < process.pid + 500, 'pid makes sense ' + pid + ' vs ' + process.pid)
     t.ok(rnd >= 0 && rnd < 1, 'rnd result makes sense')
   })
 
@@ -371,14 +370,14 @@ tape('call timeout test', function (t) {
   // should come back ok
   child(50, function (err, pid, rnd) {
     t.ok(pid > process.pid, 'pid makes sense ' + pid + ' vs ' + process.pid)
-    t.ok(pid < process.pid + 750, 'pid makes sense ' + pid + ' vs ' + process.pid)
+    t.ok(pid < process.pid + 500, 'pid makes sense ' + pid + ' vs ' + process.pid)
     t.ok(rnd > 0 && rnd < 1, 'rnd result makes sense ' + rnd)
   })
 
   // should come back ok
   child(50, function (err, pid, rnd) {
     t.ok(pid > process.pid, 'pid makes sense ' + pid + ' vs ' + process.pid)
-    t.ok(pid < process.pid + 750, 'pid makes sense ' + pid + ' vs ' + process.pid)
+    t.ok(pid < process.pid + 500, 'pid makes sense ' + pid + ' vs ' + process.pid)
     t.ok(rnd > 0 && rnd < 1, 'rnd result makes sense ' + rnd)
   })
 
@@ -413,7 +412,7 @@ tape('call timeout test', function (t) {
   setTimeout(function () {
     child(50, function (err, pid, rnd) {
       t.ok(pid > process.pid, 'pid makes sense ' + pid + ' vs ' + process.pid)
-      t.ok(pid < process.pid + 750, 'pid makes sense ' + pid + ' vs ' + process.pid)
+      t.ok(pid < process.pid + 500, 'pid makes sense ' + pid + ' vs ' + process.pid)
       t.ok(rnd > 0 && rnd < 1, 'rnd result makes sense ' + rnd)
     })
     workerFarm.end(child, function () {
@@ -517,28 +516,6 @@ tape('test max retries after process terminate', function (t) {
 
   workerFarm.end(child2, function () {
     fs.unlinkSync(filepath2)
-    t.ok(true, 'workerFarm ended')
-  })
-})
-
-
-tape('custom arguments can be passed to "fork"', function (t) {
-  t.plan(3)
-
-  // allocate a real, valid path, in any OS
-  let cwd = fs.realpathSync(os.tmpdir())
-    , workerOptions = {
-        cwd      : cwd
-      , execArgv : ['--no-warnings']
-    }
-    , child = workerFarm({ maxConcurrentWorkers: 1, maxRetries: 5, workerOptions: workerOptions}, childPath, ['args'])
-
-  child.args(function (err, result) {
-    t.equal(result.execArgv[0], '--no-warnings', 'flags passed (overridden default)')
-    t.equal(result.cwd, cwd, 'correct cwd folder')
-  })
-
-  workerFarm.end(child, function () {
     t.ok(true, 'workerFarm ended')
   })
 })
