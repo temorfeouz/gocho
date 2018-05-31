@@ -8,7 +8,7 @@ You need these tools installed in order to develop Gocho:
 * NodeJS (ui)
 * GNU Make (for general process building)
 * Go (for main code compilation)
-* go-bindata (for embedding UI inside final binary). 
+* go-bindata (for embedding UI inside final binary).
 
 
 > *Installing go-bindata creates a binary, don't forget to add $GOPATH/bin to your path* It's important that go-bindata is in the path becuase `make generate` &mdash;the command that embeds ui code into binary&mdash; needs it.
@@ -36,7 +36,7 @@ To build `gocho` binary and test it while you do changes run:
 
     $ make build-dev
 
-Which will create the `gocho` binary at `$GOPATH/bin/gocho` as that command runs `go install github.com/donkeysharp/gocho/cmd/gocho`
+Which will create the `gocho` binary at `$GOPATH/bin/gocho` as that command runs `go install github.com/temorfeouz/gocho/cmd/gocho`
 
 ## UI Development
 Gocho UI uses React and was intialized using [Create React App](https://github.com/facebook/create-react-app).

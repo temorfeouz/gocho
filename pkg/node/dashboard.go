@@ -14,8 +14,8 @@ import (
 
 	gzip "github.com/klauspost/pgzip"
 
-	"github.com/donkeysharp/gocho/assets"
-	"github.com/donkeysharp/gocho/pkg/config"
+	"github.com/temorfeouz/gocho/assets"
+	"github.com/temorfeouz/gocho/pkg/config"
 )
 
 const (

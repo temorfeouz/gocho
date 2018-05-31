@@ -1,4 +1,4 @@
-Gocho - Local Network File Sharing [![Build Status](https://travis-ci.org/donkeysharp/gocho.svg?branch=master)](https://travis-ci.org/donkeysharp/gocho)
+Gocho - Local Network File Sharing [![Build Status](https://travis-ci.org/temorfeouz/gocho.svg?branch=master)](https://travis-ci.org/temorfeouz/gocho)
 ==================================
 
 Gocho allows you to share a chosen directory with others on the same local network, without the need to setup Samba or OS-oriented settings. It provides a local dashboard which you can access through your browser, to discover what others are sharing without knowing other's IP addresses.
@@ -13,7 +13,7 @@ Run Gocho, browse to [localhost:1337](http://localhost:1337) and see what others
 > If you want to help and contribute don't forget to check the [Building document](docs/building.md) in order to have your environment ready.
 
 ## Install
-[Download the latest release](https://github.com/donkeysharp/gocho/releases) for your operating system. Currently the following operating systems are being supported:
+[Download the latest release](https://github.com/temorfeouz/gocho/releases) for your operating system. Currently the following operating systems are being supported:
 
 * GNU/Linux 32 bits
 * GNU/Linux 64 bits

@@ -2,9 +2,10 @@ package cmds
 
 import (
 	"fmt"
-	"github.com/donkeysharp/gocho/pkg/config"
-	"github.com/donkeysharp/gocho/pkg/info"
-	"github.com/donkeysharp/gocho/pkg/node"
+
+	"github.com/temorfeouz/gocho/pkg/config"
+	"github.com/temorfeouz/gocho/pkg/info"
+	"github.com/temorfeouz/gocho/pkg/node"
 	"github.com/urfave/cli"
 )
 

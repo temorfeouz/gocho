@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/donkeysharp/gocho/pkg/config"
+	"github.com/temorfeouz/gocho/pkg/config"
 )
 
 const (
@@ -94,8 +94,8 @@ const (
 
 	    function archive(type, elem){
 		        var params = "elem="+window.location.pathname+elem;
-window.location='/archive?'+params;
-return;
+				window.location='/archive?'+params;
+				return;
 		        var xhr = new XMLHttpRequest();
 		        xhr.open('GET', '/archive?'+params, true);
 

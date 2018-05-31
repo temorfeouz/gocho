@@ -2,8 +2,9 @@ package node
 
 import (
 	"container/list"
-	"github.com/donkeysharp/gocho/pkg/config"
 	"time"
+
+	"github.com/temorfeouz/gocho/pkg/config"
 )
 
 func startAnnouncer(conf *config.Config, nodeList *list.List) {

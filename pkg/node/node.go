@@ -2,7 +2,8 @@ package node
 
 import (
 	"container/list"
-	"github.com/donkeysharp/gocho/pkg/config"
+
+	"github.com/temorfeouz/gocho/pkg/config"
 )
 
 const (

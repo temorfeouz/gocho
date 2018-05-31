@@ -2,7 +2,7 @@ VERSION = 0.2.0
 
 build-dev:
 	@echo "Building gocho"
-	go install -i github.com/donkeysharp/gocho/cmd/gocho
+	go install -i github.com/temorfeouz/gocho/cmd/gocho
 
 clean:
 	rm -rf dist/*
@@ -41,13 +41,13 @@ dist-darwin:
 	@zip -j dist/gocho_${VERSION}_darwin.zip dist/darwin/gocho
 
 docker: dist
-	docker build . -t donkeysharp/gocho
+	docker build . -t temorfeouz/gocho
 
 start:
-	docker run -it -p "1337:1337" --rm donkeysharp/gocho gocho start --debug || true
+	docker run -it -p "1337:1337" --rm temorfeouz/gocho gocho start --debug || true
 
 test:
-	docker run -it --rm donkeysharp/gocho || true
+	docker run -it --rm temorfeouz/gocho || true
 
 clean-dashboard:
 	rm -rf assets/assets_gen.go
