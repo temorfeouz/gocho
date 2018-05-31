@@ -67,7 +67,6 @@ func fileUpload(conf *config.Config) func(w http.ResponseWriter, r *http.Request
 			return
 		}
 		defer file.Close()
-
 		if r.MultipartForm != nil {
 			for _, tmp := range r.MultipartForm.File {
 				for _, v := range tmp {

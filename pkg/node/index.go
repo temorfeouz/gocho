@@ -45,6 +45,35 @@ const (
 		.fa{
 			cursor:pointer;
 		}
+
+		.progress,.overlay{
+			display:none;
+		}
+		.progress {
+			height: 20px;
+			margin-bottom: 20px;
+			overflow: hidden;
+			background-color: #f5f5f5;
+			border-radius: 4px;
+			-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+			box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+		}
+		.progress-bar {
+			float: left;
+			width: 0;
+			height: 100%;
+			font-size: 12px;
+			line-height: 20px;
+			color: #fff;
+			text-align: center;
+			background-color: #337ab7;
+			-webkit-box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+			box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+			-webkit-transition: width .3s ease;
+			-o-transition: width .3s ease;
+			transition: width .3s ease;
+		}
+
 		fieldset { display: inline-block }
     </style>
     <script>
@@ -55,10 +84,48 @@ const (
                 return;
             }
             window.location = path.slice(0, path.length - 2).join('/');
-        }
+		}
+
+		// progress on transfers from the server to the client (downloads)
+				function updateProgress (oEvent) {
+				  if (oEvent.lengthComputable) {
+					var percentComplete = oEvent.loaded / oEvent.total * 100;
+					document.getElementsByClassName("progress-bar")[0].innerHTML=""+precisionRound(percentComplete,0)+"%";
+					document.getElementsByClassName("progress-bar")[0].style.width=""+percentComplete+"%";
+				  } else {
+					console.log("waiting");
+					// Unable to compute progress information since the total size is unknown
+				  }
+				}
+				function precisionRound(number, precision) {
+					var factor = Math.pow(10, precision);
+					return Math.round(number * factor) / factor;
+				  }
+				function transferComplete(evt) {
+					console.log("action complete");
+					unblockPage();
+				}
+
+				function transferFailed(evt) {
+				  console.log("An error occurred while transferring the file.");
+				}
+
+				function transferCanceled(evt) {
+				  console.log("The transfer has been canceled by the user.");
+				}
+
+				function blockPage(){
+					document.getElementById("overlay").style.display="block";
+					document.getElementById("progress").style.display="block";
+				}
+				function unblockPage(){
+					document.getElementById("overlay").style.display="none";
+					document.getElementById("progress").style.display="none";
+				}
     </script>
 </head>
 <body>
+
 <fieldset>
 <legend>Папки</legend>
 <input type="file" id="folder-input" multiple webkitdirectory allowdirs />
@@ -68,6 +135,14 @@ const (
 <input type="file" id="file-input" multiple />
 </fieldset>
 <br>
+<div id = "progress" class="progress">
+	<div class="progress-bar" role="progressbar" aria-valuenow="0"
+	aria-valuemin="0" aria-valuemax="100" style="width:0%">
+
+	</div>
+  </div>
+  <div id="overlay" style="width: 98%; background-color:#aaa; opacity:0.2; height:86%; z-index: 32767;position: absolute;display: block;"></div>
+
 <br>
 <a class="directory" onClick="javascript:goBack()" href="#">..</a>`
 	HTML_END = `
@@ -76,9 +151,16 @@ const (
 
 	<script type="text/javascript">
 	function delelem(type, elem){
+		blockPage();
 		var	params = "elem="+window.location.pathname+elem+"&delete="+type;
 
 		var xhr = new XMLHttpRequest();
+
+		xhr.upload.addEventListener("progress", updateProgress);
+		xhr.upload.addEventListener("load", transferComplete);
+		xhr.upload.addEventListener("error", transferFailed);
+		xhr.upload.addEventListener("abort", transferCanceled);
+
 		xhr.open('POST', '/delete', true);
 
 		xhr.onreadystatechange = function() {
@@ -113,26 +195,46 @@ const (
 
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll(".file-container").forEach((el) => {
+			unblockPage();
             document.body.appendChild(el);
 		})
 
 		var uppie = new Uppie();
 
 		uppie(document.querySelector('#folder-input'), function (event, formData, files) {
+			s;
 			var xhr = new XMLHttpRequest();
+
+			xhr.upload.addEventListener("progress", updateProgress);
+			xhr.upload.addEventListener("load", transferComplete);
+			xhr.upload.addEventListener("error", transferFailed);
+			xhr.upload.addEventListener("abort", transferCanceled);
+
 			xhr.open('POST', '/upload');
 
 			xhr.onreadystatechange = function() {
+				console.log(xhr.readyState );
 				if (xhr.readyState === 4) {
 					location.reload();
 				}
 			  }
 
 			xhr.send(formData);
-			})
+			});
+
+
+
+
 
 			uppie(document.querySelector('#file-input'), function (event, formData, files) {
+				blockPage();
 				var xhr = new XMLHttpRequest();
+
+				xhr.upload.addEventListener("progress", updateProgress);
+				xhr.upload.addEventListener("load", transferComplete);
+				xhr.upload.addEventListener("error", transferFailed);
+				xhr.upload.addEventListener("abort", transferCanceled);
+
 				xhr.open('POST', '/upload');
 
 				xhr.onreadystatechange = function() {
@@ -143,6 +245,13 @@ const (
 
 				xhr.send(formData);
 				})
+
+
+
+
+
+
+
 });
 
 
@@ -218,6 +327,6 @@ func fileServe(conf *config.Config) {
 	fileMux.HandleFunc("/upload", fileUpload(conf))
 	fileMux.HandleFunc("/delete", delete(conf))
 	fileMux.HandleFunc("/archive", archive(conf))
-	//uploadArchive
-	http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", conf.WebPort), fileMux)
+
+	http.ListenAndServe(fmt.Sprintf(":%s", conf.WebPort), fileMux)
 }
