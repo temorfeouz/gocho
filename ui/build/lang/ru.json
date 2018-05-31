@@ -1,0 +1,31 @@
+{
+    "menus": [
+        {
+            "node_information": "Информация по ноде"
+        },
+        {
+            "discover": "Просмотр"
+        }
+    ],
+    "sections": {
+        "node_information": {
+            "title": "Информация о ноде",
+            "node_settings": "Настройки",
+            "node_id": "Идентификатор",
+            "web_port": "Порт просмотра файлов",
+            "dashboard_port": "Порт панели",
+            "shared_directory": "Общая папка"
+        },
+        "discover": {
+            "title": "Просмотр",
+            "auto_discovery": "Автосканирование",
+            "no_node_selected": "Ничего не вбрано",
+            "no_nodes_available": "Нет доступных элементов для просмотра",
+            "node_id": "ИД",
+            "web_port": "Порт просмотра файлов",
+            "URL": "Урл",
+            "view_files": "Просмотр файлов",
+            "open_in_tab": "Открыть в новой закладке"
+        }
+    }
+}
