@@ -5,5 +5,6 @@ import (
 )
 
 func AssetFS() *assetfs.AssetFS {
+
 	return &assetfs.AssetFS{Asset: Asset, AssetDir: AssetDir, AssetInfo: AssetInfo, Prefix: "../../ui/build"}
 }

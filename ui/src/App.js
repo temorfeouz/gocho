@@ -18,10 +18,11 @@ class App extends Component {
       }
     ];
     this.state = {
-      title: this.menu[0].name,
-      selectedItem: 0,
-      toggle: false,
+      title: this.menu[1].name,
+      selectedItem: 1,
+      toggle: true,
     }
+
   }
   collapse(e) {
     this.setState({

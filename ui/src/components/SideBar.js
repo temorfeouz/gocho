@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
 class SideBar extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      currentItem: 0
+      currentItem: 1
     }
   }
   itemClickHandler(e) {

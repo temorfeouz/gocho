@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
 class Panel extends Component {
   render() {
-    return  <div className="panel">
+    return <div className="panel">
       <header>
         {this.props.title}
       </header>

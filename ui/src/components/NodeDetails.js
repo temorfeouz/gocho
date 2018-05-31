@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import FormField from './FormField';
 
 
@@ -14,7 +14,7 @@ class NodeDetails extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      displayIframe: false,
+      displayIframe: true,
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -58,7 +58,7 @@ class NodeDetails extends Component {
           &nbsp;|&nbsp;
         </div>
       </div>
-      { iframeViewer }
+      {iframeViewer}
     </div>
   }
 }
