@@ -62,12 +62,6 @@ func fileUpload(conf *config.Config) func(w http.ResponseWriter, r *http.Request
 			panic(err)
 		}
 
-		// file, _, err := r.FormFile("files[]")
-		// if err != nil {
-		// 	w.Write([]byte(fmt.Sprintf("Error on upload file -> %s", err)))
-		// 	return
-		// }
-		// defer file.Close()
 		if r.MultipartForm != nil {
 			for _, tmp := range r.MultipartForm.File {
 				for _, v := range tmp {
@@ -182,6 +176,7 @@ func archive(conf *config.Config) func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(fmt.Sprintf("On open archive -> %s", err.Error())))
 			return
 		}
+		defer zipped.Close()
 
 		w.Header().Set("Content-Disposition", "attachment; filename="+filename+".zip")
 		w.Header().Set("Content-Type", "application/zip")
@@ -271,24 +266,16 @@ func saveFile(file multipart.File, basePath, filePath string) error {
 		os.MkdirAll(fullFilePath, os.ModePerm)
 	}
 
-	// here write directly
-	data, err := ioutil.ReadAll(file)
+	// create file for saving
+	f, err := os.OpenFile(fmt.Sprintf("%s/%s", fullFilePath, filename), os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
-	return ioutil.WriteFile(
-		fmt.Sprintf("%s/%s", fullFilePath, filename),
-		data, os.ModePerm,
-	)
-	//saving file
-	// return os.Create(fmt.Sprintf("%s/%s", fullFilePath, filename))
+	_, err = io.Copy(f, file)
 
-	// fqn := fmt.Sprintf("%s/%s", basePath, filePath)
-	// get file name and file path
-
-	// os.saveFile(/)
-	// return nil, nil
+	return err
 }
 
 func dashboardServe(conf *config.Config, nodeList *list.List) {
