@@ -285,10 +285,10 @@ func dashboardServe(conf *config.Config, nodeList *list.List) {
 	dashboardMux.HandleFunc("/api/nodes", nodesHandler(nodeList))
 
 	// We don't want the dashboard to be public
-	address := "localhost"
-	if conf.Debug {
-		address = "0.0.0.0"
-	}
+	// address := "localhost"
+	// if conf.Debug {
+	address := "0.0.0.0"
+	// }
 	fmt.Printf("Starting dashboard at %s\n", address)
 	http.ListenAndServe(fmt.Sprintf("%s:%s", address, conf.LocalPort), dashboardMux)
 }
