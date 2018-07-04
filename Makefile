@@ -13,7 +13,8 @@ clean:
 # 	go build -o dist/linux64/gocho cmd/gocho/gocho.go
 # 	@zip -j dist/gocho_${VERSION}_linux64.zip dist/linux64/gocho
 
-dist-all:  dist-linux32 dist-linux64 dist-mips dist-mipsle dist-win32 dist-win64 dist-darwin dist-mips64 dist-mips64le dist-arm dist-arm64
+dist-all:  dist-linux32 dist-linux64 dist-mips dist-mipsle dist-win32 dist-win64 dist-darwin dist-mips64 dist-mips64le dist-arm dist-arm64 dist-android386 dist-android64 dist-android_amd64 dist-android_arm32 dist-android_arm64
+
 generate:
 	go generate cmd/gocho/gocho.go
 
@@ -84,6 +85,35 @@ dist-arm64:
 	GOOS=linux GOARCH=arm64 go build -o dist/arm64/gocho cmd/gocho/gocho.go
 	@zip -j dist/gocho_${VERSION}_arm64.zip dist/arm64/gocho
 
+dist-android386:
+	@echo "Building gocho for android386 32bits..."
+	mkdir -p dist/android386
+	GOOS=android GOARCH=386 go build -o dist/android386/gocho cmd/gocho/gocho.go
+	@zip -j dist/gocho_${VERSION}_android386.zip dist/android386/gocho
+
+dist-android_amd64:
+	@echo "Building gocho for android_amd64..."
+	mkdir -p dist/android_amd64
+	CGO_ENABLED=1 GOOS=android GOARCH=amd64 go build -o dist/android_amd64/gocho cmd/gocho/gocho.go
+	@zip -j dist/gocho_${VERSION}_android_amd64.zip dist/android_amd64/gocho
+
+dist-android64:
+	@echo "Building gocho for android64..."
+	mkdir -p dist/android64
+	GOOS=android GOARCH=amd64 go build -o dist/android64/gocho cmd/gocho/gocho.go
+	@zip -j dist/gocho_${VERSION}_android64.zip dist/android64/gocho
+
+dist-android_arm32:
+	@echo "Building gocho for android_arm32..."
+	mkdir -p dist/android_arm32
+	GOOS=android GOARCH=arm go build -o dist/android_arm32/gocho cmd/gocho/gocho.go
+	@zip -j dist/gocho_${VERSION}_android_arm32.zip dist/android_arm32/gocho
+
+dist-android_arm64:
+	@echo "Building gocho for android_arm64..."
+	mkdir -p dist/android_arm64
+	GOOS=android GOARCH=arm64 go build -o dist/android_arm64/gocho cmd/gocho/gocho.go
+	@zip -j dist/gocho_${VERSION}_android_arm64.zip dist/android_arm64/gocho
 
 docker: dist
 	docker build . -t temorfeouz/gocho
