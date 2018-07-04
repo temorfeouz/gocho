@@ -46,7 +46,7 @@ const (
 			cursor:pointer;
 		}
 
-		.progress,.overlay{
+		.progress,.overlay,#overlay{
 			display:none;
 		}
 		.progress {
@@ -115,7 +115,7 @@ const (
 				}
 
 				function blockPage(){
-					document.getElementById("overlay").style.display="block";
+					 document.getElementById("overlay").style.display="block";
 					document.getElementById("progress").style.display="block";
 				}
 				function unblockPage(){
@@ -124,7 +124,7 @@ const (
 				}
     </script>
 </head>
-<body>
+<body onload="unblockPage();">
 
 <fieldset>
 <legend>Папки</legend>
@@ -141,7 +141,7 @@ const (
 
 	</div>
   </div>
-  <div id="overlay" style="width: 98%; background-color:#aaa; opacity:0.2; height:86%; z-index: 32767;position: absolute;display: block;"></div>
+  <div id="overlay" style="width: 98%; background-color:#aaa; opacity:0.2; height:86%; z-index: 32767;position: absolute;display: none;"></div>
 
 <br>
 <a class="directory" onClick="javascript:goBack()" href="#">..</a>`
@@ -194,15 +194,16 @@ const (
 
 
     document.addEventListener('DOMContentLoaded', () => {
+		unblockPage();
+		console.log("loaded!");
         document.querySelectorAll(".file-container").forEach((el) => {
-			unblockPage();
             document.body.appendChild(el);
 		})
 
 		var uppie = new Uppie();
 
 		uppie(document.querySelector('#folder-input'), function (event, formData, files) {
-			//blockPage();
+			blockPage();
 			var xhr = new XMLHttpRequest();
 
 			xhr.upload.addEventListener("progress", updateProgress);
@@ -219,7 +220,7 @@ const (
 				}
 			  }
 
-			  console.log(window.location.pathname);
+			//   console.log(window.location.pathname);
 			formData.append("dir",window.location.pathname);
 
 			xhr.send(formData);
@@ -230,7 +231,7 @@ const (
 
 
 			uppie(document.querySelector('#file-input'), function (event, formData, files) {
-				//blockPage();
+				blockPage();
 				var xhr = new XMLHttpRequest();
 
 				xhr.upload.addEventListener("progress", updateProgress);
