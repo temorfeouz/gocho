@@ -334,5 +334,5 @@ func fileServe(conf *config.Config) {
 	fileMux.HandleFunc("/delete", delete(conf))
 	fileMux.HandleFunc("/archive", archive(conf))
 
-	http.ListenAndServe(fmt.Sprintf(":%s", conf.WebPort), fileMux)
+	http.ListenAndServe(fmt.Sprintf("%s:%s", conf.Interface, conf.WebPort), fileMux)
 }

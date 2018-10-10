@@ -2,12 +2,13 @@ package config
 
 import (
 	"fmt"
-	"github.com/Pallinder/go-randomdata"
-	homedir "github.com/mitchellh/go-homedir"
 	"io/ioutil"
 	"os"
 	"os/user"
 	"strings"
+
+	"github.com/Pallinder/go-randomdata"
+	homedir "github.com/mitchellh/go-homedir"
 )
 
 func fileExists(file string) bool {
@@ -54,6 +55,7 @@ func getDefaultConfig() (*Config, error) {
 		LocalPort:      defaultLocalPort,
 		NodeId:         defaultNodeId,
 		ConfigFile:     configFile,
+		Interface:      "127.0.0.1",
 	}
 	return config, nil
 }

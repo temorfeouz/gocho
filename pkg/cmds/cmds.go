@@ -9,6 +9,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+// ConfigureAction ConfigureAction
 func ConfigureAction(c *cli.Context) error {
 	err := config.ConfigureWizard()
 	if err != nil {
@@ -17,6 +18,7 @@ func ConfigureAction(c *cli.Context) error {
 	return nil
 }
 
+// StartAction StartAction
 func StartAction(c *cli.Context) error {
 	fmt.Println("Starting Gocho Node...")
 	conf := &config.Config{}
@@ -24,6 +26,7 @@ func StartAction(c *cli.Context) error {
 	conf.LocalPort = c.String("local-port")
 	conf.WebPort = c.String("share-port")
 	conf.ShareDirectory = c.String("dir")
+	conf.Interface = c.String("interface")
 	conf.NodeId = c.String("id")
 
 	if conf.NodeId == "" || conf.ShareDirectory == "" {
@@ -46,6 +49,7 @@ func StartAction(c *cli.Context) error {
 	return nil
 }
 
+// New New
 func New() *cli.App {
 	app := cli.NewApp()
 	app.Name = info.APP_NAME
@@ -53,8 +57,8 @@ func New() *cli.App {
 	app.Version = info.VERSION
 	app.Authors = []cli.Author{
 		cli.Author{
-			Name:  "Sergio Guillen Mantilla",
-			Email: "serguimant@gmail.com",
+			Name:  "Temorfeouz",
+			Email: "temorfeouz@gmail.com",
 		},
 	}
 
@@ -76,6 +80,12 @@ func New() *cli.App {
 					Name:   "dir",
 					Usage:  "Directory to share",
 					EnvVar: "GOCHO_DIR",
+				},
+				cli.StringFlag{
+					Name:   "interface",
+					Usage:  "i",
+					EnvVar: "GOCHO_INTERFACE",
+					Value:  "127.0.0.1",
 				},
 				cli.StringFlag{
 					Name:   "share-port",

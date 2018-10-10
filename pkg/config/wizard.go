@@ -19,6 +19,7 @@ func configureWizard() error {
 	fmt.Println("It will reset previous \"Gocho\" configure file")
 	var (
 		shareDirectory string
+		i              string
 		webPort        string
 		localPort      string
 		nodeId         string
@@ -26,7 +27,7 @@ func configureWizard() error {
 
 	fmt.Printf("Node Id: (%s) ", config.NodeId)
 	fmt.Scanf("%s", &nodeId)
-	fmt.Printf("Share Directory: ")
+	fmt.Printf("Share Directory: (%s)", config.ShareDirectory)
 	// In windows it fails using fmt.Scanf
 	lineRaw, _, err := reader.ReadLine()
 	fmt.Println(string(lineRaw))
@@ -39,6 +40,8 @@ func configureWizard() error {
 	fmt.Scanf("%s", &webPort)
 	fmt.Printf("Dashboard Port: (%s) ", config.LocalPort)
 	fmt.Scanf("%s", &localPort)
+	fmt.Printf("Listen interface: (%s) ", config.Interface)
+	fmt.Scanf("%s", &i)
 
 	if nodeId != "" {
 		config.NodeId = nodeId
@@ -51,6 +54,9 @@ func configureWizard() error {
 	}
 	if localPort != "" {
 		config.LocalPort = localPort
+	}
+	if i != "" {
+		config.Interface = i
 	}
 
 	if fileExists(config.ConfigFile) {

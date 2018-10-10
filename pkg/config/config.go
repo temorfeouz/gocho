@@ -2,12 +2,14 @@ package config
 
 import (
 	"fmt"
-	yaml "gopkg.in/yaml.v2"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
 	NodeId         string `yaml:"NodeId" json:"nodeId"`
+	Interface      string `yaml:"Interface" json:"interface"`
 	WebPort        string `yaml:"WebPort" json:"webPort"`
 	LocalPort      string `yaml:"LocalPort" json:"localPort"`
 	ShareDirectory string `yaml:"ShareDirectory" json:"sharedDirectory"`
