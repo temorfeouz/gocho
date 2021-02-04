@@ -1,15 +1,19 @@
 package node
 
 import (
+	"archive/tar"
+	"bufio"
 	"container/list"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	gzip "github.com/klauspost/pgzip"
@@ -142,56 +146,90 @@ func archive(conf *config.Config) func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(fmt.Sprintf("On validate -> %s", err.Error())))
 			return
 		}
-		filename := getFilename(relativePath)
+		filename := buildFullFilePath(conf.ShareDirectory, relativePath)
 
-		tmpFile := fmt.Sprintf("%s/%s.%s", getTmpFolder(conf), filename, "zip")
-
-		// Get a Buffer to Write To
-		outFile, err := os.Create(tmpFile)
+		zr, err := gzip.NewWriterLevel(w, gzip.BestSpeed)
+		wrt := tar.NewWriter(zr)
+		//zr.SetConcurrency(1048576, runtime.NumCPU())
 		if err != nil {
-			w.Write([]byte(fmt.Sprintf("On create tmp file -> %s", err.Error())))
+			w.Write([]byte(err.Error()))
 			return
 		}
-		defer outFile.Close()
+		defer zr.Close()
+		defer wrt.Close()
 
-		// Create a new zip archive.
-		zw := gzip.NewWriter(outFile)
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="`+getFilename(relativePath)+` .tar.gz"`))
 
-		// Add some files to the archive.
-		err = addFiles(zw, buildFullFilePath(conf.ShareDirectory, relativePath), "")
-
+		fi, err := os.Stat(filename)
 		if err != nil {
-			w.Write([]byte(fmt.Sprintf("On archiving -> %s", err.Error())))
-			return
-		}
-		// Make sure to check the error on Close.
-		err = zw.Close()
-		if err != nil {
-			w.Write([]byte(fmt.Sprintf("On closing archive -> %s", err.Error())))
+			fmt.Println(err)
 			return
 		}
 
-		zipped, err := os.Open(tmpFile)
-		if err != nil {
-			w.Write([]byte(fmt.Sprintf("On open archive -> %s", err.Error())))
-			return
-		}
-		defer zipped.Close()
+		switch mode := fi.Mode(); {
+		case mode.IsDir():
+			// walk through every file in the folder
+			filepath.Walk(filename, func(file string, fi os.FileInfo, err error) error {
+				// generate tar header
+				header, err := tar.FileInfoHeader(fi, file)
+				if err != nil {
+					return err
+				}
+				// must provide real name
+				// (see https://golang.org/src/archive/tar/common.go?#L626)
+				header.Name = filepath.ToSlash(file)
 
-		w.Header().Set("Content-Disposition", "attachment; filename="+filename+".zip")
-		w.Header().Set("Content-Type", "application/zip")
-		// w.Header().Set("Content-Length", zipped.)
-
-		if _, err := io.Copy(w, zipped); err != nil {
-			w.Write([]byte(fmt.Sprintf("On sending archive -> %s", err.Error())))
-			return
-		}
-
-		if err := os.Remove(tmpFile); err != nil {
-			w.Write([]byte(fmt.Sprintf("On removing archive -> %s", err.Error())))
-			return
+				// write header
+				if err := wrt.WriteHeader(header); err != nil {
+					return err
+				}
+				// if not a dir, write file content
+				if !fi.IsDir() {
+					data, err := os.Open(file)
+					if err != nil {
+						return err
+					}
+					if _, err := io.Copy(wrt, data); err != nil {
+						return err
+					}
+				}
+				return nil
+			})
+		case mode.IsRegular():
+			if f, err := os.OpenFile(filename, os.O_RDONLY, 0755); err == nil {
+				fi, err2 := f.Stat()
+				if err2 != nil {
+					fmt.Errorf("%s", err)
+					return
+				}
+				log.Printf("processing %s file size %v", filename, ByteCountSI(fi.Size()))
+				fr := bufio.NewReader(f)
+				fp, _ := filepath.Abs(filename)
+				header, _ := tar.FileInfoHeader(fi, fp)
+				header.Name = filepath.ToSlash(filename)
+				wrt.WriteHeader(header)
+				if _, err := io.Copy(wrt, fr); err != nil {
+					fmt.Errorf("err io.copy %s - %s", filename, err)
+				}
+				defer f.Close()
+			}
 		}
 	}
+}
+
+func ByteCountSI(b int64) string {
+	const unit = 1000
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB",
+		float64(b)/float64(div), "kMGTPE"[exp])
 }
 func addFiles(w *gzip.Writer, basePath, baseInZip string) error {
 	var (
