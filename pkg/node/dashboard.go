@@ -59,9 +59,8 @@ func nodesHandler(nodeList *list.List) func(http.ResponseWriter, *http.Request) 
 }
 
 func fileUpload(conf *config.Config) func(w http.ResponseWriter, r *http.Request) {
-
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseMultipartForm(2 << 20)
+		err := r.ParseMultipartForm(4096 << 20)
 		if err != nil {
 			panic(err)
 		}
@@ -70,21 +69,21 @@ func fileUpload(conf *config.Config) func(w http.ResponseWriter, r *http.Request
 			for _, tmp := range r.MultipartForm.File {
 				for _, v := range tmp {
 
-					file, err := v.Open()
+					func() {
+						file, err := v.Open()
+						if err != nil {
+							w.Write([]byte(fmt.Sprintf("Error on open file -> %s", err)))
+							return
+						}
 
-					if err != nil {
-						w.Write([]byte(fmt.Sprintf("Error on open file -> %s", err)))
-						return
-					}
+						defer file.Close()
 
-					err = saveFile(file, conf.ShareDirectory+r.FormValue("dir"), v.Filename)
-					if err != nil {
-						w.Write([]byte(fmt.Sprintf("Error on create file -> %s", err)))
-						return
-					}
-
-					file.Close()
-
+						err = saveFile(file, conf.ShareDirectory+r.FormValue("dir"), v.Filename)
+						if err != nil {
+							w.Write([]byte(fmt.Sprintf("Error on create file -> %s", err)))
+							return
+						}
+					}()
 				}
 			}
 		}

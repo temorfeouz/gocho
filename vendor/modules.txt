@@ -9,7 +9,7 @@ github.com/elazarl/go-bindata-assetfs
 # github.com/klauspost/compress v1.11.7
 ## explicit
 github.com/klauspost/compress/flate
-# github.com/klauspost/pgzip v1.2.5
+# github.com/klauspost/pgzip v1.2.6
 ## explicit
 github.com/klauspost/pgzip
 # github.com/mitchellh/go-homedir v1.1.0
